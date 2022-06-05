@@ -36,10 +36,9 @@ class Imagem:
     end_col = start_col + len(mat_sel[0])
     for l in range(start_line, end_line):
         for c in range(start_col, end_col):
-            if c > len(transposed[0])-1 and l < self.selecao['y']+len(mat_sel): 
-                #bug here - add offset!
+            if c > len(transposed[0])-1+start_col and l < self.selecao['y']+len(mat_sel): 
                 self.img[l][c] = 0
-            elif l > self.selecao['y']+len(transposed)-1 or c > len(transposed[0])-1:
+            elif l > self.selecao['y']+len(transposed)-1 or c > len(transposed[0])-1+start_col:
                 pass
             else:
                 self.img[l][c] = transposed[l-self.selecao['y']][c-self.selecao['x']]
