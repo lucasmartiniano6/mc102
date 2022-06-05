@@ -5,15 +5,6 @@ class Imagem:
     self.img = img
     self.selecao = {'x': 0, 'y': 0, 'largura': self.largura, 'altura': self.altura}
 
-  def printImg(self):
-    #BUG: printando 1 espaco a mais no final
-    for l in self.img:
-      for c in l:
-        if c == 0:
-            c = '000'
-        print(str(c), '', end='') #aq
-      print()
-
   def getSelect(self):
     mat_sel = []
     idx = 0
@@ -46,6 +37,7 @@ class Imagem:
     for l in range(start_line, end_line):
         for c in range(start_col, end_col):
             if c > len(transposed[0])-1 and l < self.selecao['y']+len(mat_sel): 
+                #bug here - add offset!
                 self.img[l][c] = 0
             elif l > self.selecao['y']+len(transposed)-1 or c > len(transposed[0])-1:
                 pass
@@ -79,7 +71,14 @@ class Imagem:
             idx +=1 
 
   def espVert(self):
-    pass
+    start_line = self.selecao['y']
+    end_line = start_line + self.selecao['altura']
+    start_col = self.selecao['x']
+    end_col = start_col + self.selecao['largura']
+    idx = 0
+    for l in range(start_line, (self.selecao['altura']//2)+1):
+      self.img[l][start_col:end_col], self.img[end_line-1-idx][start_col:end_col] = self.img[end_line-1-idx][start_col:end_col], self.img[l][start_col:end_col]
+      idx += 1
 
 largura, altura = [int(x) for x in input().split()]
 n_op = int(input())
@@ -111,4 +110,9 @@ for _ in range(n_op):
             img.espHoriz()
         else:
             img.espVert()
-img.printImg()
+
+for l in img.img:
+  line = l
+  for c in range(len(l)):
+    line[c] = '{:03}'.format(l[c])
+  print(*line)
