@@ -1,6 +1,3 @@
-# bug - dupla selecao (
-# bug - espelhamento v
-# checar test 4.in
 class Imagem:
   def __init__(self, l, a, img):
     self.largura = l
@@ -36,16 +33,15 @@ class Imagem:
     start_line = self.selecao['y']
     end_line = start_line + len(transposed)
     start_col = self.selecao['x']
-    end_col = start_col + len(mat_sel[0])
+    end_col = start_col + len(transposed[0])
+    for l in range(self.selecao['y'], self.selecao['y']+self.selecao['altura']):
+        for c in range(self.selecao['x'], self.selecao['x']+self.selecao['largura']):
+            self.img[l][c] = 0
+
     for l in range(start_line, end_line):
         for c in range(start_col, end_col):
-            if c > len(transposed[0])-1+start_col and l < self.selecao['y']+len(mat_sel): 
-                self.img[l][c] = 0
-            elif l > self.selecao['y']+len(transposed)-1 or c > len(transposed[0])-1+start_col:
-                pass
-            else:
-                self.img[l][c] = transposed[l-self.selecao['y']][c-self.selecao['x']]
-    
+            self.img[l][c] = transposed[l-self.selecao['y']][c-self.selecao['x']]
+
   def copia(self, x, y):
     mat_sel = self.getSelect()
     start_line = y
@@ -57,10 +53,16 @@ class Imagem:
             self.img[l][c] = mat_sel[l-y][c-x]
   
   def recorte(self, x, y):
-    self.copia(x,y)
+    mat_sel = self.getSelect()
+
     for l in range(self.selecao['y'],self.selecao['y']+self.selecao['altura']):
         for c in range(self.selecao['x'],self.selecao['x']+self.selecao['largura']):
-            self.img[l][c] = 0   
+            self.img[l][c] = 0
+
+    for l in range(y, y+self.selecao['altura']):
+        for c in range(x, x+self.selecao['largura']):
+            self.img[l][c] = mat_sel[l-y][c-x]
+
   def espHoriz(self):
     start_line = self.selecao['y']
     end_line = start_line+self.selecao['altura']
@@ -68,9 +70,9 @@ class Imagem:
     end_col = start_col + self.selecao['largura']
     for l in range(start_line, end_line):
         idx = 0
-        for c in range((end_col-start_col)//2):
-            self.img[l][c+start_col], self.img[l][c+end_col-1-idx] = self.img[l][c+end_col-1-idx], self.img[l][c+start_col]
-            idx +=1 
+        for c in range(start_col, start_col+(self.selecao['largura']//2)):
+            self.img[l][c], self.img[l][end_col-1-idx] = self.img[l][end_col-1-idx], self.img[l][c]
+            idx += 1
 
   def espVert(self):
     start_line = self.selecao['y']
@@ -78,7 +80,6 @@ class Imagem:
     start_col = self.selecao['x']
     end_col = start_col + self.selecao['largura']
     idx = 0
-    # BUG HERE - add offset inside range?
     for l in range(start_line, start_line+(self.selecao['altura']//2)):
       self.img[l][start_col:end_col], self.img[end_line-1-idx][start_col:end_col] = self.img[end_line-1-idx][start_col:end_col], self.img[l][start_col:end_col]
       idx += 1
@@ -90,6 +91,13 @@ for l in range(altura):
     linha = [int(x) for x in input().split()]
     matriz.append(linha)
 img = Imagem(largura,altura,matriz)
+
+def print_Img(img):
+  for l in img.img:
+    line = l
+    for c in range(len(l)):
+      line[c] = '{:03}'.format(l[c])
+    print(*line)
 
 for _ in range(n_op):
     operacao = input().split()
@@ -114,8 +122,4 @@ for _ in range(n_op):
         else:
             img.espVert()
 
-for l in img.img:
-  line = l
-  for c in range(len(l)):
-    line[c] = '{:03}'.format(l[c])
-  print(*line)
+print_Img(img)
