@@ -1,3 +1,6 @@
+# bug - dupla selecao (
+# bug - espelhamento v
+# checar test 4.in
 class Imagem:
   def __init__(self, l, a, img):
     self.largura = l
@@ -75,7 +78,8 @@ class Imagem:
     start_col = self.selecao['x']
     end_col = start_col + self.selecao['largura']
     idx = 0
-    for l in range(start_line, (self.selecao['altura']//2)+1):
+    # BUG HERE - add offset inside range?
+    for l in range(start_line, start_line+(self.selecao['altura']//2)):
       self.img[l][start_col:end_col], self.img[end_line-1-idx][start_col:end_col] = self.img[end_line-1-idx][start_col:end_col], self.img[l][start_col:end_col]
       idx += 1
 
